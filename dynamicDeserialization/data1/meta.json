@@ -1,0 +1,7 @@
+{
+  "definition": "struct WriterStruct1 { 
+      int foo;
+      string bar; 
+      string odd;
+    };"
+}
