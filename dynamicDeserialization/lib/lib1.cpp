@@ -82,15 +82,9 @@ extern "C" void Delete(void * instance) { \
 // ############ user input of WriterStruct ############
 STRUCT(
   WriterStruct,
-  int, foo,
-  std::string, bar,
-  std::string, odd
-);
+int,foo,string,bar,string,odd);
 // Max taking 8 fields
 // char, field9 <-- error (even with comma after field8)
 FUNC(
   WriterStruct,
-  int, foo,
-  std::string, bar,
-  std::string, odd
-);// #####################################################
+int,foo,string,bar,string,odd);

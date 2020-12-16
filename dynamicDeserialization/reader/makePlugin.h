@@ -7,6 +7,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
+#include <iterator>
 
 #define PATH_SIZE 128
 #define OFFSET 5
@@ -14,6 +16,8 @@
 #define END_WORD "/meta.json"
 #define PREFIX "../lib/lib"
 #define COMPILE_DLL "g++ -fPIC -shared "
+#define STARTINGBRACE "{"
+#define ENDINGBRACE "}"
 
 using namespace std;
 
@@ -27,7 +31,7 @@ string read_meta_file (string file_path) {
 }
 
 // write the dynamic plugin and return its path
-void write_dll_source_file(string dll_sourcecode_path) {  
+void write_dll_source_file(string dll_sourcecode_path, string writerStruct_fields) {  
   cout << "\nWriting dynamic plugin source code...\n";
 
   ofstream outFile(dll_sourcecode_path.c_str());
@@ -114,21 +118,16 @@ void write_dll_source_file(string dll_sourcecode_path) {
                       "\n"
                       "// ############ user input of WriterStruct ############\n"
                       "STRUCT(\n"
-                      "  WriterStruct,\n"
-                      "  int, foo,\n"
-                      "  std::string, bar,\n"
-                      "  std::string, odd\n"
+                      "  WriterStruct,\n" +
+                        writerStruct_fields +
                       ");\n"
                       "// Max taking 8 fields\n"
                       "// char, field9 <-- error (even with comma after field8)\n"
                       "FUNC(\n"
-                      "  WriterStruct,\n"
-                      "  int, foo,\n"
-                      "  std::string, bar,\n"
-                      "  std::string, odd\n"
-                      ");"
-                      "// #####################################################\n";
-  
+                      "  WriterStruct,\n" +
+                        writerStruct_fields +
+                      ");";
+                        
   // Write to the dll source code file
   outFile << text;
 
@@ -162,17 +161,32 @@ void compile_dll(string dll_target_path, string dll_path) {
     }
 }
 
+string extract_fields(string message_definition) {
+  // extract the WriterStruct fields between the two braces, assuming only two brances
+  unsigned first = message_definition.find(STARTINGBRACE);
+  unsigned last = message_definition.find(ENDINGBRACE);
+  string fields = message_definition.substr (first+1,last-first-1);  
+  //eliminate ";"
+  string result;
+  remove_copy(fields.begin(), fields.end(), back_inserter(result), ';');
+  //replace " " with ","  assuming there is space after each break 
+  replace(result.begin(), result.end(), ' ', ',');
+  return result;
+}
+
 // Return a string that is a path to the shared object
 string make_plugin(string meta_file_path) {
   // 1. load JSON file (assuming the JSON file is valid), obtain WriterStruct 
   string message_definition = read_meta_file(meta_file_path);
   cout << "message_definition:\n" << message_definition << endl;
 
-  // 2. TODO: string substitution of WriterStruct fields in lib#.cpp source file
+  // 2. extract WriterStruct fields and substitute into lib#.cpp source file
+  string writerStruct_fields = extract_fields(message_definition);
+  cout << "writerStruct_fields:\n" << writerStruct_fields << endl;
 
   // 3. Generate source code for a plugin (ex. write lib#.cpp)
   string dll_target_path = generate_file_path(meta_file_path, ".cpp");
-  write_dll_source_file(dll_target_path);
+  write_dll_source_file(dll_target_path, writerStruct_fields);
   cout << "dll_source_code_path: " << dll_target_path << endl;
 
   // 4. Compile the source code to a shared object (ex. lib#.cpp -> lib#.so)
