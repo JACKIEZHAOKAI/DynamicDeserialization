@@ -52,8 +52,6 @@ Struct ReaderStruct {	// ROS@2.3
 };
 ```
 
-![](Img/input.png)
-
 ### Step2:
 The WriterStruct is defined by the Writer at the time the dataset is created. It is defined by the package installed in the docker that is running on the truck. The user needs to provides the metadata of WriterStruct in JSON files, which will be used for deserializing message payload.  
 
