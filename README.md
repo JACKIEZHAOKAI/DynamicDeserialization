@@ -13,19 +13,19 @@ As a result, now the user has to recompile their user code again and again based
 For example, while deserializing messages, if the user already compiled their user code that can deserialize the message in version  ROS@2.3, the user wants to be able to read any other dataset (ex. ROS@2.4,  ROS@2.5, ZORO@2.5).
 
 ## Prior researches
-### Option1: Dynamic Message Plugins, Static User-Declared Memory Layout
+#### Option1: Dynamic Message Plugins, Static User-Declared Memory Layout
 Compile separate deserialization plugins for every message_type+ version
 JIT or store with the dataset
 Dynamically load the appropriate plugin at runtime  
 The user declares fields they expect at compile time
 Some parts of the library/plugin figure out how to map the fields defined in the message to the fields declared by the user, probably using reflection.
-### Option2: Dynamic Typing
+#### Option2: Dynamic Typing
 Provide an interface like C++ JSON libraries for accessing fields in datasets
 May require a custom deserialization library
-### Option3: Historic Messages in octopus_msgs
+#### Option3: Historic Messages in octopus_msgs
 Provide a package that includes all versions of messages
 Enable users to handle separate message versions in one binary
-### Option4: Upgrade Datasets when Messages Change
+#### Option4: Upgrade Datasets when Messages Change
 Provide tooling and automation to automatically recreate topics with different message format and version for datasets when it changes
 Recompile when new formats are released
 
