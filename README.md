@@ -106,7 +106,7 @@ ReaderStruct* obj;
     }
     return obj;
 }
-    ```
+```
 
 ### Design Diagram
 ![](Img/design.png)
