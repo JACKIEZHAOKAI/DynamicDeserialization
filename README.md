@@ -1,5 +1,4 @@
-# TuSimple-Intern-Project
-> Dataset2 Dynamic Deserialization Project
+# Dynamic Deserialization Project
 
 ## Summary
 The goal of this project is to provide a solution that allows the user to compile once and open most datasets and any new dataset concerning different data types(ROS or Zoro) and the message versions of ROS and Zoro. It can save the user’s time in recompiling user code that reads the dataset in different types and different message versions. It should support downgrade and upgrade compatibility of message versions.
