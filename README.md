@@ -73,38 +73,39 @@ type4 field4;
 At compile time, the user generates an executable Reader only once. The Reader has a compatible application binary interface(ABI) for accessing any dynamic plugin at runtime. This supports the transferring of data from the WriterStruct in a plugin to the ReaderStruct.
 
 Since there is no way to know the WriterStruct of messages at compile-time, we develop a reflection system to map the fields in WriterStruct to fields in the user-defined ReaderStruct at runtime. 
+
 At runtime, the Reader generates a new dynamic plugin at each time it tries to read a new dataset in a different message version based on the WriterStruct metadata file (/data/meta.json). 
 Then, the Reader calls the plugin API Create to deserialize the message data into the WriterStructs and return a pointer to the WriterStruct.
     
-    ```cpp
-    void * Create(const vector<uint8_t> & msg_payload) 
-    ```
+```cpp
+void * Create(const vector<uint8_t> & msg_payload) 
+```
 
 After loading the WriterStruct into the runtime memory, and providing the field name, the Reader can obtain the address of the field in the WriterStruct by calling the plugin API GetField.
 	
-    ```cpp
-    void * GetField(void * writerStruct, string field) 
-    ```
+```cpp
+void * GetField(void * writerStruct, string field) 
+```
 
 Finally, the reader loads data from WriterStruct to ReaderStruct by calling the two ReaderStruct APIs ListFields and SetField. ListFields is used for traversing the fields in ReaderStruct, and SetField is used for loading data stored in the field address obtained from “GetField” into the corresponding field in the ReaderStruct.
 
-    ```cpp
-    static vector<string> ListFields() 
+```cpp
+static vector<string> ListFields() 
 
-    void SetField(string fieldName, void * value)
-    ```
+void SetField(string fieldName, void * value)
+```
 
 Example of the Reflection System
 
-    ```cpp
-    ReaderStruct* deserialize<ReaderStruct>(Message msg) {	 	 
-    void* ws = plugin->Create(msg);
-    ReaderStruct* obj;
-        for (field in obj->ListFields()) {
-        obj->SetField(field, plugin->GetField(ws, field));	//load WriterStruct field into ReaderStruct field
-        }
-        return obj;
+```cpp
+ReaderStruct* deserialize<ReaderStruct>(Message msg) {	 	 
+void* ws = plugin->Create(msg);
+ReaderStruct* obj;
+    for (field in obj->ListFields()) {
+    obj->SetField(field, plugin->GetField(ws, field));	//load WriterStruct field into ReaderStruct field
     }
+    return obj;
+}
     ```
 
 ### Design Diagram
